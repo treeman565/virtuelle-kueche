@@ -43,6 +43,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalContext
+import de.virtuellekueche.app.data.Fotos
+import de.virtuellekueche.app.data.GeminiProduktErkennung
+import de.virtuellekueche.app.domain.LagerortVorschlag
+import kotlinx.coroutines.launch
 import de.virtuellekueche.app.data.model.Einheit
 import de.virtuellekueche.app.data.model.Lagerort
 import de.virtuellekueche.app.data.model.Lebensmittel
@@ -64,6 +79,8 @@ fun LebensmittelDialog(
     onLoeschen: () -> Unit,
     onLagerortAnlegen: (String) -> Unit,
     onSchliessen: () -> Unit,
+    /** Zeigt den Knopf „Per Foto ausfüllen“ (nur beim Hinzufügen in der Küche). */
+    fotoAusfuellen: Boolean = false,
 ) {
     val neu = ausgangswert.id.isEmpty()
     var name by remember { mutableStateOf(ausgangswert.name) }
@@ -75,6 +92,49 @@ fun LebensmittelDialog(
     var verfallManuell by remember { mutableStateOf(!neu && !ausgangswert.verfallsdatumGeschaetzt) }
     var verfallManuellWert by remember { mutableStateOf(ausgangswert.verfallsdatum) }
     var neuerLagerortDialog by remember { mutableStateOf(false) }
+
+    // Per Foto ausfüllen
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val erkennung = remember { GeminiProduktErkennung() }
+    var fotoUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var fotoLaeuft by remember { mutableStateOf(false) }
+    var fotoHinweis by remember { mutableStateOf<String?>(null) }
+    val kamera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
+        val uri = fotoUri
+        if (!ok || uri == null) return@rememberLauncherForActivityResult
+        fotoLaeuft = true
+        fotoHinweis = null
+        scope.launch {
+            try {
+                val p = erkennung.erkennen(Fotos.laden(context, uri))
+                p.name?.let { name = it }
+                p.menge?.let { menge = Menge.format(it) }
+                p.einheit?.let { einheit = it }
+                p.name?.let { n ->
+                    val vorschlag = LagerortVorschlag.vorschlagen(n, p.lebensmittel)
+                    lagerorte.firstOrNull { it.art == vorschlag }?.let { lagerortId = it.id }
+                }
+                if (p.mhd != null) {
+                    verfallManuell = true
+                    verfallManuellWert = p.mhd
+                }
+                fotoHinweis = when {
+                    p.name == null -> "Auf dem Foto wurde kein Produkt erkannt. Versuch es mit der Vorderseite der Packung."
+                    p.mhd != null -> "Ausgefüllt, das Datum stammt von der Packung. Bitte kurz prüfen."
+                    else -> "Ausgefüllt, das Verfallsdatum ist geschätzt. Bitte kurz prüfen."
+                }
+            } catch (e: Exception) {
+                fotoHinweis = if (e is java.io.IOException || e.cause is java.io.IOException) {
+                    "Zum Erkennen brauchst du Internet."
+                } else {
+                    "Das Foto konnte nicht ausgewertet werden. Versuch es noch einmal."
+                }
+            } finally {
+                fotoLaeuft = false
+            }
+        }
+    }
 
     val art = lagerorte.firstOrNull { it.id == lagerortId }?.art ?: LagerortArt.SONSTIGE
     // Solange das Datum nicht von Hand gesetzt wurde, folgt die Schätzung Name und Lagerort.
@@ -126,6 +186,30 @@ fun LebensmittelDialog(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
+                if (fotoAusfuellen && neu) {
+                    OutlinedButton(
+                        onClick = {
+                            val uri = Fotos.neueFotoUri(context)
+                            fotoUri = uri
+                            kamera.launch(uri)
+                        },
+                        enabled = !fotoLaeuft,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        if (fotoLaeuft) {
+                            CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Wird erkannt …")
+                        } else {
+                            Icon(Icons.Outlined.PhotoCamera, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Per Foto ausfüllen")
+                        }
+                    }
+                    fotoHinweis?.let {
+                        Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
