@@ -1,0 +1,13 @@
+*.iml
+.gradle/
+/local.properties
+.idea/
+.DS_Store
+build/
+/captures
+.externalNativeBuild
+.cxx
+# Firebase-Konfiguration nicht einchecken
+app/google-services.json
+*.keystore
+*.jks
