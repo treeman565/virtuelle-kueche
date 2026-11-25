@@ -2,7 +2,7 @@
 
 Android-App, die deinen Lebensmittelvorrat per Kassenbon-Scan erfasst, als virtuelle Küche zeigt, vor dem Ablauf erinnert, Rezepte aus dem Vorrat vorschlägt und deine Ausgaben zusammenfasst.
 
-**Stand:** Schritt 2, das Grundgerüst. Anmeldung per E-Mail und Passwort, Cloud-Anbindung an Firestore mit Offline-Cache und die untere Navigation mit Küche, Rezepte, Einkaufsliste und Ausgaben (noch als Platzhalter).
+**Stand:** Schritt 3. Anmeldung, Cloud-Anbindung mit Offline-Cache und der Küche-Reiter: Lebensmittel nach Lagerort, Hinzufügen und Bearbeiten, geschätztes Verfallsdatum, Suche und Filter. Rezepte, Einkaufsliste und Ausgaben sind noch Platzhalter.
 
 ## Einrichten (einmalig)
 
@@ -21,3 +21,7 @@ Android-App, die deinen Lebensmittelvorrat per Kassenbon-Scan erfasst, als virtu
 - Ein Konto registrieren, abmelden und wieder anmelden.
 - „Passwort vergessen“ schickt eine E-Mail.
 - Zwischen den vier Reitern wechseln.
+- Im Reiter **Küche** Lebensmittel hinzufügen. Das Verfallsdatum wird aus Name und Lagerort geschätzt und lässt sich ändern.
+- Ein Lebensmittel antippen, um Menge, Lagerort oder Datum zu ändern oder es als verbraucht oder weggeworfen zu markieren.
+- Einen eigenen Lagerort anlegen (im Feld „Lagerort“ ganz unten).
+- Im Flugmodus etwas eintragen. Sobald wieder Netz da ist, wird es synchronisiert.
