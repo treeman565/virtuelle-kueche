@@ -14,6 +14,7 @@ Android-App, die deinen Lebensmittelvorrat per Kassenbon-Scan erfasst, als virtu
    - **Authentication** → Anmeldemethode **E-Mail/Passwort** aktivieren.
    - **Firestore Database** → Datenbank erstellen (Region `europe-west3`, Frankfurt).
    - Unter **Regeln** den Inhalt von [`firestore.rules`](firestore.rules) einfügen und veröffentlichen.
+   - **AI Logic** → **Jetzt starten** → **Gemini Developer API** auswählen und aktivieren (für den Kassenbon-Scan, kostenlos).
 6. Projekt in Android Studio öffnen und auf **Run** klicken (Emulator oder Handy per USB).
 
 ## Was du jetzt testen kannst
@@ -24,4 +25,5 @@ Android-App, die deinen Lebensmittelvorrat per Kassenbon-Scan erfasst, als virtu
 - Im Reiter **Küche** Lebensmittel hinzufügen. Das Verfallsdatum wird aus Name und Lagerort geschätzt und lässt sich ändern.
 - Ein Lebensmittel antippen, um Menge, Lagerort oder Datum zu ändern oder es als verbraucht oder weggeworfen zu markieren.
 - Einen eigenen Lagerort anlegen (im Feld „Lagerort“ ganz unten).
+- **Bon scannen** in der Küche: Bon fotografieren, erkannte Produkte prüfen und in die Küche übernehmen. Braucht Internet.
 - Im Flugmodus etwas eintragen. Sobald wieder Netz da ist, wird es synchronisiert.

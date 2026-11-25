@@ -78,3 +78,22 @@ data class EinkaufslistenEintrag(
     val gerichtId: String? = null,
     val erledigt: Boolean = false,
 )
+
+data class Kassenbon(
+    val id: String = "",
+    val supermarkt: String? = null,
+    val datum: Long = 0L,
+    val summeCent: Long? = null,
+    val positionen: List<KassenbonPosition> = emptyList(),
+    val erfasstAm: Long = 0L,
+)
+
+data class KassenbonPosition(
+    val bonText: String = "",
+    val name: String = "",
+    val menge: Double = 1.0,
+    val einheit: Einheit = Einheit.STUECK,
+    val preisCent: Long? = null,
+    /** Lebensmittel, das aus dieser Zeile entstanden ist, oder null, wenn nicht übernommen. */
+    val lebensmittelId: String? = null,
+)

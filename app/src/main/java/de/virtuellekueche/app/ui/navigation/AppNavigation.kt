@@ -34,10 +34,13 @@ import androidx.navigation.compose.rememberNavController
 import de.virtuellekueche.app.ui.auth.AuthViewModel
 import de.virtuellekueche.app.ui.auth.LoginScreen
 import de.virtuellekueche.app.ui.auth.SessionState
+import de.virtuellekueche.app.ui.bon.BonScanScreen
 import de.virtuellekueche.app.ui.finance.FinanceScreen
 import de.virtuellekueche.app.ui.kitchen.KitchenScreen
 import de.virtuellekueche.app.ui.recipes.RecipesScreen
 import de.virtuellekueche.app.ui.shopping.ShoppingListScreen
+
+private const val BON_ROUTE = "kassenbon"
 
 private enum class Tab(val route: String, val label: String, val icon: ImageVector) {
     Kueche("kueche", "Küche", Icons.Outlined.Kitchen),
@@ -75,11 +78,12 @@ private fun MainScaffold(onSignOut: () -> Unit) {
     val currentTab = Tab.entries.firstOrNull { tab ->
         destination?.hierarchy?.any { it.route == tab.route } == true
     } ?: Tab.Kueche
+    val titel = if (destination?.route == BON_ROUTE) "Kassenbon" else currentTab.label
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(currentTab.label) },
+                title = { Text(titel) },
                 actions = {
                     IconButton(onClick = onSignOut) {
                         Icon(Icons.AutoMirrored.Outlined.Logout, contentDescription = "Abmelden")
@@ -111,7 +115,8 @@ private fun MainScaffold(onSignOut: () -> Unit) {
             startDestination = Tab.Kueche.route,
             modifier = Modifier.padding(padding),
         ) {
-            composable(Tab.Kueche.route) { KitchenScreen() }
+            composable(Tab.Kueche.route) { KitchenScreen(onBonScannen = { navController.navigate(BON_ROUTE) }) }
+            composable(BON_ROUTE) { BonScanScreen(onFertig = { navController.popBackStack() }) }
             composable(Tab.Rezepte.route) { RecipesScreen() }
             composable(Tab.Einkauf.route) { ShoppingListScreen() }
             composable(Tab.Ausgaben.route) { FinanceScreen() }

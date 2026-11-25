@@ -52,7 +52,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.ai)
     implementation(libs.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
+    // Echte org.json-Implementierung für Unit-Tests (Android liefert dort nur Attrappen).
+    testImplementation(libs.json)
 }

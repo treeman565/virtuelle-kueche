@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -47,7 +48,7 @@ import de.virtuellekueche.app.domain.Menge
 private const val BALD_ABLAUFEND_TAGE = 2L
 
 @Composable
-fun KitchenScreen(vm: KitchenViewModel = viewModel()) {
+fun KitchenScreen(onBonScannen: () -> Unit, vm: KitchenViewModel = viewModel()) {
     val state by vm.state.collectAsStateWithLifecycle()
     // null = geschlossen, Lebensmittel mit leerer id = neu
     var bearbeiten by remember { mutableStateOf<Lebensmittel?>(null) }
@@ -67,17 +68,28 @@ fun KitchenScreen(vm: KitchenViewModel = viewModel()) {
                 onAntippen = { bearbeiten = it },
             )
         }
-        ExtendedFloatingActionButton(
-            onClick = {
-                bearbeiten = Lebensmittel(
-                    lagerortId = state.filterLagerortId ?: state.lagerorte.firstOrNull()?.id.orEmpty(),
-                    kaufdatum = Datum.heute(),
-                )
-            },
-            icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
-            text = { Text("Hinzufügen") },
-            modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp),
-        )
+        Column(
+            Modifier.align(Alignment.BottomEnd).padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.End,
+        ) {
+            ExtendedFloatingActionButton(
+                onClick = onBonScannen,
+                icon = { Icon(Icons.Outlined.PhotoCamera, contentDescription = null) },
+                text = { Text("Bon scannen") },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            )
+            ExtendedFloatingActionButton(
+                onClick = {
+                    bearbeiten = Lebensmittel(
+                        lagerortId = state.filterLagerortId ?: state.lagerorte.firstOrNull()?.id.orEmpty(),
+                        kaufdatum = Datum.heute(),
+                    )
+                },
+                icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
+                text = { Text("Hinzufügen") },
+            )
+        }
     }
 
     bearbeiten?.let { lm ->
@@ -143,7 +155,7 @@ private fun VorratListe(
             return
         }
 
-        LazyColumn(contentPadding = PaddingValues(bottom = 96.dp)) {
+        LazyColumn(contentPadding = PaddingValues(bottom = 168.dp)) {
             state.gruppen.forEach { gruppe ->
                 stickyHeader(key = "kopf-${gruppe.lagerort.id}") {
                     Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxWidth()) {

@@ -7,7 +7,7 @@ activityCompose = "1.9.3"
 lifecycle = "2.8.7"
 composeBom = "2024.12.01"
 navigation = "2.8.5"
-firebaseBom = "33.7.0"
+firebaseBom = "33.14.0"
 coroutines = "1.9.0"
 junit = "4.13.2"
 
@@ -26,8 +26,10 @@ androidx-compose-material-icons = { group = "androidx.compose.material", name = 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+firebase-ai = { group = "com.google.firebase", name = "firebase-ai" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "coroutines" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+json = { group = "org.json", name = "json", version = "20240303" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

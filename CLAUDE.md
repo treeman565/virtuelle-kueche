@@ -6,7 +6,7 @@ App zur Dokumentation des Lebensmitteleinkaufs per Kassenbon-Scan, mit virtuelle
 ## Tech-Stack (bestätigt)
 - Kotlin, Jetpack Compose, Material 3
 - Firebase Auth (E-Mail/Passwort) und Firestore mit Offline-Cache
-- KI (Bon-Scan, Rezepte): Claude über eine Firebase Cloud Function, der API-Schlüssel liegt nur dort
+- KI (Bon-Scan, später Rezepte): Gemini (gemini-2.5-flash) über Firebase AI Logic mit der Gemini Developer API, kostenloses Kontingent. Kein eigener API-Schlüssel in der App, kein eigener Server. (Entscheidung von Jan, 25.11.2026; vorher war Claude über eine Cloud Function geplant.)
 
 ## Regeln
 - Sprache der Oberfläche und der Kommunikation: Deutsch.
@@ -33,7 +33,7 @@ App zur Dokumentation des Lebensmitteleinkaufs per Kassenbon-Scan, mit virtuelle
 2. Grundgerüst mit Anmeldung und Cloud-Anbindung
 3. Lebensmittel manuell erfassen
 4. Virtuelle Küche als Oberfläche
-5. Kassenbon-Scan
+5. Kassenbon-Scan (vorgezogen, vor Schritt 4)
 6. Lernende Korrektur
 7. Benachrichtigungen vor dem Ablauf
 8. Rezeptvorschläge mit automatischem Verbrauch

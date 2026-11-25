@@ -67,7 +67,7 @@ fun LebensmittelDialog(
 ) {
     val neu = ausgangswert.id.isEmpty()
     var name by remember { mutableStateOf(ausgangswert.name) }
-    var menge by remember { mutableStateOf(if (neu) "1" else Menge.format(ausgangswert.menge)) }
+    var menge by remember { mutableStateOf(Menge.format(ausgangswert.menge)) }
     var einheit by remember { mutableStateOf(ausgangswert.einheit) }
     var lagerortId by remember { mutableStateOf(ausgangswert.lagerortId) }
     var kaufdatum by remember { mutableStateOf(ausgangswert.kaufdatum.takeIf { it > 0 } ?: Datum.heute()) }
@@ -209,7 +209,7 @@ fun LebensmittelDialog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Auswahl(
+internal fun Auswahl(
     label: String,
     wert: String,
     optionen: List<Pair<String, () -> Unit>>,
@@ -235,7 +235,7 @@ private fun Auswahl(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DatumFeld(label: String, wert: Long?, onWahl: (Long) -> Unit, hinweis: String? = null) {
+internal fun DatumFeld(label: String, wert: Long?, onWahl: (Long) -> Unit, hinweis: String? = null) {
     var offen by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = wert?.let(Datum::format).orEmpty(),
