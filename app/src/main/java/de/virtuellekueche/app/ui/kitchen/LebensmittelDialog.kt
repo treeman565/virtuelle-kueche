@@ -56,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import de.virtuellekueche.app.data.Fotos
 import de.virtuellekueche.app.data.GeminiProduktErkennung
+import de.virtuellekueche.app.data.KiFehler
 import de.virtuellekueche.app.domain.LagerortVorschlag
 import kotlinx.coroutines.launch
 import de.virtuellekueche.app.data.model.Einheit
@@ -106,8 +107,15 @@ fun LebensmittelDialog(
         fotoLaeuft = true
         fotoHinweis = null
         scope.launch {
+            val foto = try {
+                Fotos.laden(context, uri)
+            } catch (e: Exception) {
+                fotoHinweis = "Das Foto konnte nicht geladen werden: ${e.message ?: e::class.simpleName}"
+                fotoLaeuft = false
+                return@launch
+            }
             try {
-                val p = erkennung.erkennen(Fotos.laden(context, uri))
+                val p = erkennung.erkennen(foto)
                 p.name?.let { name = it }
                 p.menge?.let { menge = Menge.format(it) }
                 p.einheit?.let { einheit = it }
@@ -125,11 +133,7 @@ fun LebensmittelDialog(
                     else -> "Ausgefüllt, das Verfallsdatum ist geschätzt. Bitte kurz prüfen."
                 }
             } catch (e: Exception) {
-                fotoHinweis = if (e is java.io.IOException || e.cause is java.io.IOException) {
-                    "Zum Erkennen brauchst du Internet."
-                } else {
-                    "Das Foto konnte nicht ausgewertet werden. Versuch es noch einmal."
-                }
+                fotoHinweis = KiFehler.text(e, "Produktfoto")
             } finally {
                 fotoLaeuft = false
             }
