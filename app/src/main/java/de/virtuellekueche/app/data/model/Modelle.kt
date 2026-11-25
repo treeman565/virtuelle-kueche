@@ -1,5 +1,7 @@
 package de.virtuellekueche.app.data.model
 
+import de.virtuellekueche.app.domain.LagerortArt
+
 /*
  * Datenmodell (Firestore). Alle Daten liegen unter users/{uid}/...,
  * damit jeder Benutzer nur seine eigenen Daten sieht (siehe firestore.rules).
@@ -15,7 +17,14 @@ package de.virtuellekueche.app.data.model
  * haben alle Felder Default-Werte. Datumswerte sind Epoch-Millis.
  */
 
-enum class Einheit { STUECK, PACKUNG, GRAMM, KILOGRAMM, MILLILITER, LITER }
+enum class Einheit(val kurz: String, val lang: String) {
+    STUECK("Stk.", "Stück"),
+    PACKUNG("Pkg.", "Packung"),
+    GRAMM("g", "Gramm"),
+    KILOGRAMM("kg", "Kilogramm"),
+    MILLILITER("ml", "Milliliter"),
+    LITER("l", "Liter"),
+}
 
 enum class LebensmittelStatus { VORRAETIG, VERBRAUCHT, WEGGEWORFEN }
 
@@ -24,6 +33,7 @@ data class Lagerort(
     val name: String = "",
     /** Kühlschrank, Vorratsschrank, Tiefkühler sind Standard, weitere frei anlegbar. */
     val standard: Boolean = false,
+    val art: LagerortArt = LagerortArt.SONSTIGE,
     val reihenfolge: Int = 0,
 )
 
@@ -39,6 +49,7 @@ data class Lebensmittel(
     /** true, wenn das Verfallsdatum geschätzt und nicht von Hand gesetzt wurde. */
     val verfallsdatumGeschaetzt: Boolean = true,
     val status: LebensmittelStatus = LebensmittelStatus.VORRAETIG,
+    val statusGeaendert: Long? = null,
     val kassenbonId: String? = null,
 )
 
