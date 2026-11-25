@@ -51,7 +51,7 @@ object BonPrompt {
         - Bei Gewichtsware (z. B. "0,512 kg x 3,99 EUR/kg") ist menge 0.512 und einheit KILOGRAMM.
         - Sonst menge = Anzahl der Packungen und einheit = PACKUNG oder STUECK.
         - Pfand, Pfandrückgabe, Tüten und Zwischensummen weglassen.
-        - "lebensmittel" ist false für alles, was man nicht isst oder trinkt (z. B. Spülmittel, Batterien).
+        - "lebensmittel" ist false für alles, was man nicht isst oder trinkt (z. B. Klopapier, Spülmittel, Batterien).
         - Unlesbare Werte als null angeben, nichts erfinden.
     """.trimIndent()
 }
@@ -107,6 +107,18 @@ object BonParser {
 
 /** Schlägt vor, wo ein Produkt vom Bon eingeräumt wird. */
 object LagerortVorschlag {
+    private val haushalt = listOf(
+        "klopapier", "toilettenpapier", "zewa", "küchenrolle", "küchentuch", "taschentüch", "tempo",
+        "spülmittel", "spuelmittel", "waschmittel", "weichspüler", "spültabs", "geschirrtabs", "reiniger",
+        "müllbeutel", "muellbeutel", "müllsäcke", "alufolie", "frischhaltefolie", "backpapier", "gefrierbeutel",
+        "schwamm", "batterie", "seife", "shampoo", "duschgel", "zahnpasta", "zahncreme", "deo", "rasier",
+        "windel", "feuchttücher", "wattepads", "kerze", "glühbirne",
+    )
+    private val suess = listOf(
+        "schoko", "gummibär", "fruchtgummi", "haribo", "bonbon", "praline", "lakritz", "kaugummi",
+        "riegel", "kekse", "keks", "waffel", "nougat", "marshmallow", "chips", "flips", "erdnussflips",
+        "salzstangen", "popcorn", "süßigkeit", "kinder ", "milka", "ritter sport", "toffifee", "mentos",
+    )
     private val tiefkuehl = listOf("tk ", "tk-", "tiefkühl", "tiefgefr", "gefrier", "eiscreme", "speiseeis", "rahmspinat", "fischstäbchen", "pommes")
     private val kuehl = listOf(
         "milch", "joghurt", "jogurt", "quark", "sahne", "schmand", "butter", "käse", "kaese", "mozzarella",
@@ -114,10 +126,14 @@ object LagerortVorschlag {
         "salat", "rucola", "spinat", "beeren", "erdbeer", "tofu", "frischkäse", "eier", "margarine", "pudding",
     )
 
-    fun vorschlagen(name: String): LagerortArt {
+    /** [lebensmittel] = false kommt aus der Bon-Erkennung, z. B. für Spülmittel. */
+    fun vorschlagen(name: String, lebensmittel: Boolean = true): LagerortArt {
         val n = " ${name.lowercase()} "
         return when {
+            !lebensmittel || haushalt.any { n.contains(it) } -> LagerortArt.HAUSHALT
             tiefkuehl.any { n.contains(it) } || n.startsWith(" tk") -> LagerortArt.TIEFKUEHLER
+            // Süßes vor Kühlware, damit "Milchschokolade" nicht im Kühlschrank landet.
+            suess.any { n.contains(it) } -> LagerortArt.SUESSIGKEITEN
             kuehl.any { n.contains(it) } -> LagerortArt.KUEHLSCHRANK
             else -> LagerortArt.VORRATSSCHRANK
         }

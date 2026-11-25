@@ -72,4 +72,13 @@ class KassenbonTest {
         assertEquals(LagerortArt.VORRATSSCHRANK, LagerortVorschlag.vorschlagen("Spaghetti"))
         assertEquals(LagerortArt.KUEHLSCHRANK, LagerortVorschlag.vorschlagen("Gouda Käse"))
     }
+
+    @Test fun suessesUndHaushalt() {
+        assertEquals(LagerortArt.SUESSIGKEITEN, LagerortVorschlag.vorschlagen("Milka Alpenmilch Schokolade"))
+        assertEquals(LagerortArt.SUESSIGKEITEN, LagerortVorschlag.vorschlagen("Haribo Goldbären"))
+        assertEquals(LagerortArt.HAUSHALT, LagerortVorschlag.vorschlagen("Zewa Küchenrolle"))
+        assertEquals(LagerortArt.HAUSHALT, LagerortVorschlag.vorschlagen("Toilettenpapier 3-lagig"))
+        // Von der KI als Nicht-Lebensmittel markiert, auch ohne bekanntes Stichwort.
+        assertEquals(LagerortArt.HAUSHALT, LagerortVorschlag.vorschlagen("Grillanzünder", lebensmittel = false))
+    }
 }

@@ -29,4 +29,12 @@ class HaltbarkeitTest {
         val tag = 24L * 60 * 60 * 1000
         assertEquals(1000 + 7 * tag, Haltbarkeit.schaetzeVerfallsdatum("Milch", LagerortArt.KUEHLSCHRANK, 1000))
     }
+
+    @Test fun haushaltOhneVerfallsdatum() {
+        org.junit.Assert.assertNull(Haltbarkeit.schaetzeTage("Klopapier", LagerortArt.HAUSHALT))
+        org.junit.Assert.assertNull(Haltbarkeit.schaetzeVerfallsdatum("Zewa", LagerortArt.HAUSHALT, 1000))
+    }
+
+    @Test fun suessigkeitenHaltenLange() =
+        assertEquals(180, Haltbarkeit.schaetzeTage("Gummibärchen", LagerortArt.SUESSIGKEITEN))
 }

@@ -174,6 +174,7 @@ fun LebensmittelDialog(
                     label = "Verfallsdatum",
                     wert = verfallsdatum,
                     hinweis = when {
+                        verfallsdatum == null && art == LagerortArt.HAUSHALT -> "Für Haushaltsartikel nicht nötig. Tippe, um trotzdem eins festzulegen."
                         verfallsdatum == null -> "Wird geschätzt, sobald ein Name eingetragen ist."
                         verfallManuell -> "Von dir festgelegt."
                         else -> "Geschätzt. Tippe, um es zu ändern."

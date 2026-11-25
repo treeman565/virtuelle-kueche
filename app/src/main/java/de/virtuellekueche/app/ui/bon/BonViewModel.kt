@@ -82,7 +82,7 @@ class BonViewModel(
         val datum = ergebnis.datum ?: Datum.heute()
         val orte = lagerorte.value
         val entwuerfe = ergebnis.positionen.map { pos ->
-            val art = LagerortVorschlag.vorschlagen(pos.name)
+            val art = LagerortVorschlag.vorschlagen(pos.name, pos.lebensmittel)
             val ort = orte.firstOrNull { it.art == art } ?: orte.firstOrNull()
             Entwurf(
                 bonText = pos.bonText,
@@ -96,7 +96,7 @@ class BonViewModel(
                     verfallsdatum = Haltbarkeit.schaetzeVerfallsdatum(pos.name, ort?.art ?: LagerortArt.SONSTIGE, datum),
                     verfallsdatumGeschaetzt = true,
                 ),
-                uebernehmen = pos.lebensmittel,
+                uebernehmen = true,
             )
         }
         return BonZustand.Pruefen(ergebnis.supermarkt.orEmpty(), datum, ergebnis.summeCent, entwuerfe)

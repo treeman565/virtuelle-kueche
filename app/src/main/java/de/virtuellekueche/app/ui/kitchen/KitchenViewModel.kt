@@ -31,12 +31,12 @@ class KitchenViewModel(
 
     private val suche = MutableStateFlow("")
     private val filter = MutableStateFlow<String?>(null)
-    private var standardAngelegt = false
+    private var standardGeprueft = false
 
     private val lagerorte = repo.lagerorteFlow().onEach { liste ->
-        if (liste.isEmpty() && !standardAngelegt) {
-            standardAngelegt = true
-            repo.standardLagerorteAnlegen()
+        if (!standardGeprueft) {
+            standardGeprueft = true
+            repo.standardLagerorteErgaenzen(liste)
         }
     }
 
