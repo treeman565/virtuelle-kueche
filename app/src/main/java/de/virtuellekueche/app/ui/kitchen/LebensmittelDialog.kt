@@ -87,7 +87,7 @@ fun LebensmittelDialog(
     val preisFehler = preis.isNotBlank() && preisWert == null
     val gueltig = name.isNotBlank() && mengeWert != null && mengeWert > 0 && lagerortId.isNotEmpty() && !preisFehler
 
-    Dialog(onDismissRequest = onSchliessen, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(onDismissRequest = onSchliessen, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Scaffold(
             topBar = {
                 TopAppBar(
