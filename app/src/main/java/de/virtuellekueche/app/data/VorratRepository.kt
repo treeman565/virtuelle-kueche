@@ -55,17 +55,16 @@ class VorratRepository(
         awaitClose { reg.remove() }
     }
 
-    /** Legt beim ersten Start die drei Standard-Lagerorte an. */
-    fun standardLagerorteAnlegen() {
-        val standard = listOf(
-            Triple("kuehlschrank", "Kühlschrank", LagerortArt.KUEHLSCHRANK),
-            Triple("vorratsschrank", "Vorratsschrank", LagerortArt.VORRATSSCHRANK),
-            Triple("tiefkuehler", "Tiefkühler", LagerortArt.TIEFKUEHLER),
-        )
+    /**
+     * Legt fehlende Standard-Lagerorte an: beim ersten Start alle, bei älteren
+     * Konten nur die später dazugekommenen. Vorhandene bleiben unverändert.
+     */
+    fun standardLagerorteErgaenzen(vorhandene: List<Lagerort>) {
+        val ids = vorhandene.map { it.id }.toSet()
+        val fehlend = STANDARD_LAGERORTE.withIndex().filter { it.value.id !in ids }
+        if (fehlend.isEmpty()) return
         val batch = db.batch()
-        standard.forEachIndexed { i, (id, name, art) ->
-            batch.set(lagerorte().document(id), Lagerort(id, name, standard = true, art = art, reihenfolge = i))
-        }
+        fehlend.forEach { (i, ort) -> batch.set(lagerorte().document(ort.id), ort.copy(reihenfolge = i)) }
         batch.commit()
     }
 
@@ -113,5 +112,15 @@ class VorratRepository(
         }
         batch.set(bonRef, bon.copy(id = bonRef.id, positionen = positionen, erfasstAm = System.currentTimeMillis()))
         batch.commit()
+    }
+
+    companion object {
+        val STANDARD_LAGERORTE = listOf(
+            Lagerort("kuehlschrank", "Kühlschrank", standard = true, art = LagerortArt.KUEHLSCHRANK),
+            Lagerort("vorratsschrank", "Vorratsschrank", standard = true, art = LagerortArt.VORRATSSCHRANK),
+            Lagerort("tiefkuehler", "Tiefkühler", standard = true, art = LagerortArt.TIEFKUEHLER),
+            Lagerort("suessigkeiten", "Süßigkeitenschrank", standard = true, art = LagerortArt.SUESSIGKEITEN),
+            Lagerort("sonstiges", "Sonstiges", standard = true, art = LagerortArt.HAUSHALT),
+        )
     }
 }

@@ -25,7 +25,7 @@ App zur Dokumentation des Lebensmitteleinkaufs per Kassenbon-Scan, mit virtuelle
 
 ## Kernbegriffe
 - Lebensmittel: Name, Menge, Einheit, Lagerort, Kaufdatum, Preis, Verfallsdatum.
-- Lagerort: Kühlschrank, Vorratsschrank, Tiefkühler, weitere frei anlegbar.
+- Lagerort: Kühlschrank, Vorratsschrank, Tiefkühler, Süßigkeitenschrank, Sonstiges (Haushaltsartikel ohne Verfallsdatum), weitere frei anlegbar.
 - Virtuelle Küche: gezeichnete Küche als Hauptansicht, Lebensmittel werden automatisch oder von Hand eingeräumt.
 
 ## Umsetzungsreihenfolge

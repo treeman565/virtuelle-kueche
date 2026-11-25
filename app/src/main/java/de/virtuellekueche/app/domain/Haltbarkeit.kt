@@ -3,7 +3,16 @@ package de.virtuellekueche.app.domain
 import java.util.concurrent.TimeUnit
 
 /** Art des Lagerorts, damit die Schätzung auch für selbst angelegte Orte funktioniert. */
-enum class LagerortArt { KUEHLSCHRANK, TIEFKUEHLER, VORRATSSCHRANK, SONSTIGE }
+enum class LagerortArt {
+    KUEHLSCHRANK,
+    TIEFKUEHLER,
+    VORRATSSCHRANK,
+    SUESSIGKEITEN,
+    /** Haushaltsartikel wie Klopapier oder Spülmittel: kein Verfallsdatum. */
+    HAUSHALT,
+    /** Selbst angelegte Lagerorte. */
+    SONSTIGE,
+}
 
 /**
  * Schätzt eine typische Haltbarkeit anhand von Produktname und Lagerort.
@@ -48,11 +57,13 @@ object Haltbarkeit {
         LagerortArt.KUEHLSCHRANK to 7,
         LagerortArt.TIEFKUEHLER to 90,
         LagerortArt.VORRATSSCHRANK to 180,
+        LagerortArt.SUESSIGKEITEN to 180,
         LagerortArt.SONSTIGE to 30,
     )
 
-    /** Geschätzte Haltbarkeit in Tagen ab Kaufdatum. */
-    fun schaetzeTage(name: String, art: LagerortArt): Int {
+    /** Geschätzte Haltbarkeit in Tagen ab Kaufdatum, null = kein Verfallsdatum (Haushaltsartikel). */
+    fun schaetzeTage(name: String, art: LagerortArt): Int? {
+        if (art == LagerortArt.HAUSHALT) return null
         val woerter = name.lowercase().split(Regex("[^\\p{L}]+")).filter { it.isNotEmpty() }
         for (regel in regeln) {
             val passt = regel.stichwoerter.any { s ->
@@ -67,7 +78,7 @@ object Haltbarkeit {
         return standardTage.getValue(art)
     }
 
-    /** Geschätztes Verfallsdatum (Epoch-Millis). */
-    fun schaetzeVerfallsdatum(name: String, art: LagerortArt, kaufdatum: Long): Long =
-        kaufdatum + TimeUnit.DAYS.toMillis(schaetzeTage(name, art).toLong())
+    /** Geschätztes Verfallsdatum (Epoch-Millis), null = kein Verfallsdatum. */
+    fun schaetzeVerfallsdatum(name: String, art: LagerortArt, kaufdatum: Long): Long? =
+        schaetzeTage(name, art)?.let { kaufdatum + TimeUnit.DAYS.toMillis(it.toLong()) }
 }
