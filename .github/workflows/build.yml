@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Platzhalter für google-services.json
+        # Die echte Datei wird nie eingecheckt. Für den CI-Build reicht eine Attrappe.
+        run: |
+          cat > app/google-services.json <<'JSON'
+          {
+            "project_info": {"project_number": "000000000000", "project_id": "ci-placeholder", "storage_bucket": "ci-placeholder.appspot.com"},
+            "client": [{
+              "client_info": {"mobilesdk_app_id": "1:000000000000:android:0000000000000000", "android_client_info": {"package_name": "de.virtuellekueche.app"}},
+              "api_key": [{"current_key": "ci-placeholder"}],
+              "services": {}
+            }],
+            "configuration_version": "1"
+          }
+          JSON
+      - name: Build und Tests
+        run: ./gradlew assembleDebug testDebugUnitTest --no-daemon
