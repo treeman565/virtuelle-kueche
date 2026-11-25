@@ -2,6 +2,7 @@ package de.virtuellekueche.app.data
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import de.virtuellekueche.app.data.model.Kassenbon
 import de.virtuellekueche.app.data.model.Lagerort
 import de.virtuellekueche.app.data.model.Lebensmittel
 import de.virtuellekueche.app.data.model.LebensmittelStatus
@@ -27,6 +28,7 @@ class VorratRepository(
     private fun user() = db.collection("users").document(uid)
     private fun lagerorte() = user().collection("lagerorte")
     private fun lebensmittel() = user().collection("lebensmittel")
+    private fun kassenbons() = user().collection("kassenbons")
 
     fun lagerorteFlow(): Flow<List<Lagerort>> = callbackFlow {
         val reg = lagerorte().orderBy("reihenfolge").addSnapshotListener { snap, err ->
@@ -93,5 +95,23 @@ class VorratRepository(
 
     fun loeschen(id: String) {
         lebensmittel().document(id).delete()
+    }
+
+    /**
+     * Speichert einen Kassenbon und legt die übernommenen Lebensmittel in einem
+     * Rutsch an. [uebernehmen] enthält pro Bonzeile das Lebensmittel oder null.
+     */
+    fun kassenbonSpeichern(bon: Kassenbon, uebernehmen: List<Lebensmittel?>) {
+        require(bon.positionen.size == uebernehmen.size)
+        val bonRef = kassenbons().document()
+        val batch = db.batch()
+        val positionen = bon.positionen.mapIndexed { i, pos ->
+            val lm = uebernehmen[i] ?: return@mapIndexed pos.copy(lebensmittelId = null)
+            val ref = lebensmittel().document()
+            batch.set(ref, lm.copy(id = ref.id, kassenbonId = bonRef.id))
+            pos.copy(lebensmittelId = ref.id)
+        }
+        batch.set(bonRef, bon.copy(id = bonRef.id, positionen = positionen, erfasstAm = System.currentTimeMillis()))
+        batch.commit()
     }
 }
