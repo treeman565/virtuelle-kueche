@@ -267,7 +267,7 @@ internal fun DatumFeld(label: String, wert: Long?, onWahl: (Long) -> Unit, hinwe
 }
 
 @Composable
-private fun NeuerLagerortDialog(onAnlegen: (String) -> Unit, onAbbrechen: () -> Unit) {
+internal fun NeuerLagerortDialog(onAnlegen: (String) -> Unit, onAbbrechen: () -> Unit) {
     var name by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onAbbrechen,

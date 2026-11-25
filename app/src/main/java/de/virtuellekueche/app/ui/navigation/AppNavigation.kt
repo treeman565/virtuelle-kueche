@@ -17,7 +17,19 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.ui.unit.dp
+import de.virtuellekueche.app.ui.theme.KuechenFarben
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -78,21 +90,48 @@ private fun MainScaffold(onSignOut: () -> Unit) {
     val currentTab = Tab.entries.firstOrNull { tab ->
         destination?.hierarchy?.any { it.route == tab.route } == true
     } ?: Tab.Kueche
-    val titel = if (destination?.route == BON_ROUTE) "Kassenbon" else currentTab.label
+    val aufBon = destination?.route == BON_ROUTE
+    val titel = when {
+        aufBon -> "Kassenbon"
+        currentTab == Tab.Kueche -> "Meine Küche"
+        else -> currentTab.label
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(titel) },
+                title = { Text(titel, style = MaterialTheme.typography.headlineMedium) },
                 actions = {
+                    if (currentTab == Tab.Kueche && !aufBon) {
+                        Surface(
+                            onClick = { navController.navigate(BON_ROUTE) },
+                            shape = RoundedCornerShape(50),
+                            color = KuechenFarben.Mint,
+                            contentColor = KuechenFarben.Grund,
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            ) {
+                                Icon(Icons.Outlined.PhotoCamera, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text("Bon scannen", style = MaterialTheme.typography.labelLarge)
+                            }
+                        }
+                    }
                     IconButton(onClick = onSignOut) {
                         Icon(Icons.AutoMirrored.Outlined.Logout, contentDescription = "Abmelden")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background,
+                    actionIconContentColor = KuechenFarben.SchriftLeise,
+                ),
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(containerColor = KuechenFarben.Leiste) {
                 Tab.entries.forEach { tab ->
                     NavigationBarItem(
                         selected = tab == currentTab,
@@ -105,6 +144,13 @@ private fun MainScaffold(onSignOut: () -> Unit) {
                         },
                         icon = { Icon(tab.icon, contentDescription = null) },
                         label = { Text(tab.label) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = KuechenFarben.Grund,
+                            indicatorColor = KuechenFarben.Mint,
+                            selectedTextColor = KuechenFarben.Schrift,
+                            unselectedIconColor = KuechenFarben.SchriftLeise,
+                            unselectedTextColor = KuechenFarben.SchriftLeise,
+                        ),
                     )
                 }
             }
@@ -115,7 +161,7 @@ private fun MainScaffold(onSignOut: () -> Unit) {
             startDestination = Tab.Kueche.route,
             modifier = Modifier.padding(padding),
         ) {
-            composable(Tab.Kueche.route) { KitchenScreen(onBonScannen = { navController.navigate(BON_ROUTE) }) }
+            composable(Tab.Kueche.route) { KitchenScreen() }
             composable(BON_ROUTE) { BonScanScreen(onFertig = { navController.popBackStack() }) }
             composable(Tab.Rezepte.route) { RecipesScreen() }
             composable(Tab.Einkauf.route) { ShoppingListScreen() }

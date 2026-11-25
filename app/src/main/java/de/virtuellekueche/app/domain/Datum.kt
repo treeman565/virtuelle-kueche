@@ -34,4 +34,18 @@ object Datum {
         in 2L..Long.MAX_VALUE -> "noch $t Tage"
         else -> "seit ${-t} Tagen abgelaufen"
     }
+
+    /**
+     * Kurzform für das Ablauf-Kästchen: Zahl und Einheit, z. B. ("2", "Tage"),
+     * ("1", "Tag"), ("11", "Mon.") oder ("!", "abgel.") wenn schon abgelaufen.
+     */
+    fun ablaufKurz(millis: Long, heute: Long = heute()): Pair<String, String> {
+        val t = tageBis(millis, heute)
+        return when {
+            t < 0 -> "!" to "abgel."
+            t == 1L -> "1" to "Tag"
+            t <= 60 -> "$t" to "Tage"
+            else -> "${Math.round(t / 30.4)}" to "Mon."
+        }
+    }
 }

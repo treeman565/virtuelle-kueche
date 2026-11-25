@@ -11,7 +11,7 @@ App zur Dokumentation des Lebensmitteleinkaufs per Kassenbon-Scan, mit virtuelle
 ## Regeln
 - Sprache der Oberfläche und der Kommunikation: Deutsch.
 - Zielplattform: Android, store-tauglich bauen.
-- Design: schlicht, clean, Material Design. Keine überladene Optik.
+- Design: schlicht, clean, Material Design. Keine überladene Optik. Gewählt ist Design D „Kacheln am Abend“: Waldgrün #0F2A22 als Grund, Mint #7FD1AE als Akzent, Schrift DM Sans, Lagerorte als Kacheln mit großem Symbol ohne Text und Anzahl in der Ecke, Ablauf als kleines Quadrat mit Zahl.
 - Erst planen, dann Code schreiben. Wichtige Entscheidungen (Tech-Stack, Dienste, Kosten) vorher mit mir abstimmen.
 - In kleinen, einzeln testbaren Schritten arbeiten.
 - API-Schlüssel und Passwörter niemals im App-Code oder im Repository speichern, sondern nur auf dem Server oder in Umgebungsvariablen.

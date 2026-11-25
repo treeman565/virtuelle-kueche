@@ -19,4 +19,13 @@ class DatumTest {
         assertEquals("seit gestern abgelaufen", Datum.ablaufText(Datum.ausTag(LocalDate.of(2026, 11, 24)), heute))
         assertEquals("seit 3 Tagen abgelaufen", Datum.ablaufText(Datum.ausTag(LocalDate.of(2026, 11, 22)), heute))
     }
+
+    @Test fun ablaufKurzform() {
+        fun am(j: Int, m: Int, t: Int) = Datum.ablaufKurz(Datum.ausTag(LocalDate.of(j, m, t)), heute)
+        assertEquals("0" to "Tage", am(2026, 11, 25))
+        assertEquals("1" to "Tag", am(2026, 11, 26))
+        assertEquals("9" to "Tage", am(2026, 12, 4))
+        assertEquals("11" to "Mon.", am(2027, 10, 25))
+        assertEquals("!" to "abgel.", am(2026, 11, 20))
+    }
 }
