@@ -3,9 +3,9 @@ package de.virtuellekueche.app.ui.bon
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.FirebaseNetworkException
 import de.virtuellekueche.app.data.BonErkennung
 import de.virtuellekueche.app.data.GeminiBonErkennung
+import de.virtuellekueche.app.data.KiFehler
 import de.virtuellekueche.app.data.VorratRepository
 import de.virtuellekueche.app.data.model.Kassenbon
 import de.virtuellekueche.app.data.model.KassenbonPosition
@@ -16,7 +16,6 @@ import de.virtuellekueche.app.domain.Datum
 import de.virtuellekueche.app.domain.Haltbarkeit
 import de.virtuellekueche.app.domain.LagerortArt
 import de.virtuellekueche.app.domain.LagerortVorschlag
-import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -155,11 +154,5 @@ class BonViewModel(
     private fun aendern(block: (BonZustand.Pruefen) -> BonZustand.Pruefen) =
         _zustand.update { if (it is BonZustand.Pruefen) block(it) else it }
 
-    private fun fehlertext(e: Exception): String = when {
-        e is FirebaseNetworkException || e is IOException || e.cause is IOException ->
-            "Zum Lesen des Bons brauchst du Internet. Versuch es noch einmal, sobald du Netz hast."
-        e is IllegalArgumentException ->
-            "Der Bon konnte nicht gelesen werden. Versuch es mit einem schärferen, gut beleuchteten Foto."
-        else -> "Das Lesen hat nicht geklappt: ${e.message ?: e::class.simpleName}"
-    }
+    private fun fehlertext(e: Exception): String = KiFehler.text(e, "Kassenbon")
 }
