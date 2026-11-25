@@ -165,6 +165,7 @@ fun KitchenScreen(vm: KitchenViewModel = viewModel()) {
             onLoeschen = { vm.loeschen(lm); bearbeiten = null },
             onLagerortAnlegen = vm::lagerortAnlegen,
             onSchliessen = { bearbeiten = null },
+            fotoAusfuellen = true,
         )
     }
     if (neuerLagerort) {
