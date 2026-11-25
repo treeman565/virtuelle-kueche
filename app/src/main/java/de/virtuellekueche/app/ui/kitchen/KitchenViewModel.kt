@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
-data class LagerortGruppe(val lagerort: Lagerort, val lebensmittel: List<Lebensmittel>)
-
 data class KitchenUiState(
     val laedt: Boolean = true,
     val lagerorte: List<Lagerort> = emptyList(),
-    val gruppen: List<LagerortGruppe> = emptyList(),
+    /** Anzahl vorrätiger Produkte je Lagerort-ID. */
+    val anzahl: Map<String, Int> = emptyMap(),
+    /** Gefilterte Liste, nach Verfallsdatum sortiert. */
+    val liste: List<Lebensmittel> = emptyList(),
+    val gesamt: Int = 0,
     val suche: String = "",
     val filterLagerortId: String? = null,
     val fehler: String? = null,
@@ -42,15 +44,15 @@ class KitchenViewModel(
 
     val state: StateFlow<KitchenUiState> =
         combine(lagerorte, repo.vorratFlow(), suche, filter) { orte, vorrat, s, f ->
-            val treffer = vorrat.filter { s.isBlank() || it.name.contains(s.trim(), ignoreCase = true) }
-            val gruppen = orte
-                .filter { f == null || it.id == f }
-                .map { ort -> LagerortGruppe(ort, treffer.filter { it.lagerortId == ort.id }) }
-                .filter { it.lebensmittel.isNotEmpty() || (s.isBlank() && f == null) }
+            val liste = vorrat
+                .filter { f == null || it.lagerortId == f }
+                .filter { s.isBlank() || it.name.contains(s.trim(), ignoreCase = true) }
             KitchenUiState(
                 laedt = false,
                 lagerorte = orte,
-                gruppen = gruppen,
+                anzahl = vorrat.groupingBy { it.lagerortId }.eachCount(),
+                liste = liste,
+                gesamt = vorrat.size,
                 suche = s,
                 filterLagerortId = f,
             )
